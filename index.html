@@ -4,254 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mission Control | Joanne's Agent Fleet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            /* Perplexity Brand Colors */
+            --color-deep-teal: #091717;
+            --color-dark-teal: #13343B;
+            --color-medium-teal: #2E565D;
+            --color-accent-teal: #218090;
+            --color-bright-teal: #20B8CD;
+            --color-light-teal: #BADFDE;
+            --color-cream: #FCFAF6;
+            --color-warm-cream: #E5E3D4;
+            --color-peach: #FFD2A6;
+            --color-terracotta: #A94B30;
+            --color-muted-red: #954456;
+            --shadow-soft: 0 4px 20px rgba(9, 23, 23, 0.08);
+            --shadow-medium: 0 8px 30px rgba(9, 23, 23, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--color-cream);
             min-height: 100vh;
-            color: #e94560;
+            color: var(--color-deep-teal);
         }
         .header {
-            background: rgba(0,0,0,0.3);
-            padding: 20px 40px;
-            border-bottom: 2px solid #e94560;
+            background: var(--color-cream);
+            padding: 24px 48px;
+            border-bottom: 1px solid var(--color-warm-cream);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 2px;
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .header .subtitle {
-            color: #8892b0;
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--color-accent-teal), var(--color-bright-teal));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: var(--shadow-soft);
+        }
+        .header-text h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--color-deep-teal);
+            letter-spacing: -0.5px;
+        }
+        .header-text .subtitle {
             font-size: 14px;
-            margin-top: 5px;
+            color: var(--color-medium-teal);
         }
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 30px 40px;
+            padding: 40px 48px;
         }
         .stats-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 24px;
+            margin-bottom: 40px;
         }
         .stat-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(233, 69, 96, 0.2);
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--color-warm-cream);
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
         }
         .stat-card .label {
-            color: #8892b0;
-            font-size: 12px;
+            font-size: 13px;
+            color: var(--color-medium-teal);
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
         .stat-card .value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
-            color: #e94560;
-            margin-top: 5px;
+            color: var(--color-deep-teal);
+            letter-spacing: -1px;
         }
         .section {
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.05);
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--color-warm-cream);
         }
         .section-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
-            color: #fff;
-            margin-bottom: 20px;
+            color: var(--color-deep-teal);
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 20px;
-            background: #e94560;
-            border-radius: 2px;
+            gap: 12px;
         }
         .entity-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding: 6px;
+            background: var(--color-cream);
+            border-radius: var(--radius-xl);
+            width: fit-content;
         }
         .entity-tab {
-            padding: 10px 20px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(233, 69, 96, 0.2);
-            color: #8892b0;
+            padding: 12px 24px;
+            border-radius: var(--radius-lg);
+            background: transparent;
+            color: var(--color-medium-teal);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+            border: none;
+            font-family: inherit;
         }
-        .entity-tab:hover, .entity-tab.active {
-            background: rgba(233, 69, 96, 0.2);
-            border-color: #e94560;
-            color: #fff;
+        .entity-tab:hover {
+            background: rgba(33, 128, 144, 0.1);
+            color: var(--color-accent-teal);
+        }
+        .entity-tab.active {
+            background: white;
+            color: var(--color-deep-teal);
+            box-shadow: var(--shadow-soft);
+            font-weight: 600;
         }
         .deals-table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
         }
         .deals-table th {
             text-align: left;
-            padding: 12px 15px;
-            color: #8892b0;
-            font-size: 11px;
+            padding: 16px 20px;
+            color: var(--color-medium-teal);
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-warm-cream);
+            background: var(--color-cream);
         }
         .deals-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            color: #fff;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--color-warm-cream);
+            color: var(--color-deep-teal);
+            font-weight: 500;
+        }
+        .deals-table tr:hover td {
+            background: rgba(186, 223, 222, 0.2);
         }
         .deal-stage {
-            padding: 4px 10px;
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 10px;
-            font-weight: 500;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-        .stage-in-progress { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
-        .stage-quote-send { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
-        .stage-no-reply { background: rgba(136, 146, 176, 0.2); color: #8892b0; }
-        .stage-first-meeting { background: rgba(52, 152, 219, 0.2); color: #3498db; }
-        .stage-paused { background: rgba(136, 146, 176, 0.2); color: #8892b0; }
-        .stage-closed-won { background: rgba(0, 212, 170, 0.2); color: #00d4aa; }
-        .stage-closed-lost { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
-        .stage-completed { background: rgba(0, 212, 170, 0.2); color: #00d4aa; }
-        .priority-high { color: #e94560; font-weight: 600; }
-        .priority-moderate { color: #f39c12; }
-        .priority-low { color: #8892b0; }
-        .pipeline-summary {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        .summary-item {
-            background: rgba(0,0,0,0.2);
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .summary-item .label {
-            color: #8892b0;
             font-size: 11px;
-        }
-        .summary-item .value {
-            color: #fff;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            display: inline-block;
         }
-        .entity-section {
-            display: none;
-        }
-        .entity-section.active {
-            display: block;
+        .stage-in-progress { background: linear-gradient(135deg, var(--color-light-teal), rgba(186, 223, 222, 0.5)); color: var(--color-medium-teal); }
+        .stage-quote-send { background: linear-gradient(135deg, var(--color-peach), rgba(255, 210, 166, 0.5)); color: var(--color-terracotta); }
+        .stage-no-reply { background: var(--color-warm-cream); color: var(--color-medium-teal); }
+        .stage-first-meeting { background: linear-gradient(135deg, #dbeafe, rgba(219, 234, 254, 0.5)); color: #2563eb; }
+        .stage-paused { background: var(--color-warm-cream); color: var(--color-medium-teal); }
+        .stage-closed-won { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
+        .stage-closed-lost { background: linear-gradient(135deg, #fee2e2, rgba(254, 226, 226, 0.5)); color: #dc2626; }
+        .priority-high { color: var(--color-terracotta); font-weight: 600; }
+        .priority-moderate { color: #d97706; font-weight: 500; }
+        .priority-low { color: var(--color-medium-teal); font-weight: 500; }
+        .entity-section { display: none; }
+        .entity-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .agents-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
         }
         .agent-card {
-            background: rgba(0,0,0,0.2);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid rgba(233, 69, 96, 0.15);
+            background: linear-gradient(135deg, white, var(--color-cream));
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            border: 1px solid var(--color-warm-cream);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+        .agent-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
         }
         .agent-card::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--status-color, #e94560);
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-accent-teal), var(--color-bright-teal));
         }
-        .agent-card.idle { --status-color: #8892b0; }
-        .agent-card.active { --status-color: #00d4aa; }
-        .agent-card.busy { --status-color: #f39c12; }
-        .agent-card.completed { --status-color: #00d4aa; }
         .agent-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
         .agent-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 10px;
-            background: rgba(233, 69, 96, 0.1);
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--color-light-teal), var(--color-warm-cream));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 24px;
+            box-shadow: var(--shadow-soft);
         }
         .agent-info h3 {
-            font-size: 16px;
-            color: #fff;
-            margin-bottom: 3px;
+            font-size: 18px;
+            color: var(--color-deep-teal);
+            margin-bottom: 4px;
+            font-weight: 600;
         }
         .agent-status {
             font-size: 12px;
-            color: var(--status-color);
+            color: var(--color-accent-teal);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            font-weight: 500;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .agent-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-accent-teal);
         }
         .agent-task {
-            font-size: 13px;
-            color: #8892b0;
-            line-height: 1.5;
-            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--color-medium-teal);
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
         .btn {
-            padding: 8px 14px;
-            border-radius: 6px;
+            padding: 10px 18px;
+            border-radius: var(--radius-md);
             border: none;
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            font-family: inherit;
         }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent-teal), var(--color-bright-teal));
+            color: white;
+            box-shadow: var(--shadow-soft);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-medium); }
         .btn-secondary {
-            background: rgba(255,255,255,0.1);
-            color: #8892b0;
+            background: var(--color-cream);
+            color: var(--color-medium-teal);
+            border: 1px solid var(--color-warm-cream);
         }
-        .btn-secondary:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .btn-secondary:hover { background: var(--color-warm-cream); color: var(--color-deep-teal); }
         .last-updated {
-            text-align: right;
-            color: #8892b0;
-            font-size: 12px;
-            margin-top: 20px;
+            text-align: center;
+            color: var(--color-medium-teal);
+            font-size: 13px;
+            margin-top: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 1024px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .container { padding: 24px; }
+        }
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; gap: 16px; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🎯 MISSION CONTROL</h1>
-        <div class="subtitle">Joanne's Agent Fleet | NDN GROUP | Deal Pipeline Dashboard</div>
-    </div>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-brand">
+                <div class="header-logo">🎯</div>
+                <div class="header-text">
+                    <h1>Mission Control</h1>
+                    <div class="subtitle">Joanne's Agent Fleet | NDN GROUP</div>
+                </div>
+            </div>
+        </div>
+    </header>
     
     <div class="container">
-        <!-- Stats Bar -->
         <div class="stats-bar">
             <div class="stat-card">
                 <div class="label">Total Pipeline</div>
@@ -271,38 +356,24 @@
             </div>
         </div>
         
-        <!-- Deal Pipeline Section -->
         <div class="section">
-            <div class="section-title">Deal Pipeline by Entity</div>
+            <div class="section-title">💼 Deal Pipeline</div>
             
             <div class="entity-tabs">
-                <div class="entity-tab active" onclick="showEntity('ndn')">NDN (7 deals)</div>
-                <div class="entity-tab" onclick="showEntity('ndn-shanghai')">NDN Shanghai (10 deals)</div>
-                <div class="entity-tab" onclick="showEntity('trackbill')">Trackbill (0 deals)</div>
-                <div class="entity-tab" onclick="showEntity('yas')">YAS (0 deals)</div>
+                <button class="entity-tab active" onclick="showEntity('ndn')">NDN (7)</button>
+                <button class="entity-tab" onclick="showEntity('ndn-shanghai')">NDN Shanghai (10)</button>
+                <button class="entity-tab" onclick="showEntity('trackbill')">Trackbill (0)</button>
+                <button class="entity-tab" onclick="showEntity('yas')">YAS (0)</button>
             </div>
             
-            <!-- NDN Deals -->
             <div id="ndn" class="entity-section active">
-                <div class="pipeline-summary">
-                    <div class="summary-item">
-                        <div class="label">Pipeline Value</div>
-                        <div class="value">$2.83M</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Closed Won</div>
-                        <div class="value">$698K</div>
-                    </div>
-                </div>
                 <table class="deals-table">
                     <thead>
                         <tr>
                             <th>Company</th>
                             <th>Status</th>
                             <th>Value</th>
-                            <th>Probability</th>
                             <th>Priority</th>
-                            <th>Next Step</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -310,87 +381,31 @@
                             <td>Ocean Park</td>
                             <td><span class="deal-stage stage-in-progress">In Progress</span></td>
                             <td>$500,000</td>
-                            <td>50%</td>
                             <td><span class="priority-low">Low</span></td>
-                            <td>Tender submitted</td>
                         </tr>
                         <tr>
                             <td>Armor Capital</td>
                             <td><span class="deal-stage stage-in-progress">In Progress</span></td>
                             <td>$1,056,000</td>
-                            <td>50%</td>
                             <td><span class="priority-high">High</span></td>
-                            <td>Create 3-tier pricing plan</td>
-                        </tr>
-                        <tr>
-                            <td>Buy & Ship</td>
-                            <td><span class="deal-stage stage-no-reply">No Reply</span></td>
-                            <td>$374,400</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>Paused until further discuss</td>
-                        </tr>
-                        <tr>
-                            <td>Jupiter Logistics</td>
-                            <td><span class="deal-stage stage-paused">Paused</span></td>
-                            <td>$198,900</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>CEO requested hold off</td>
-                        </tr>
-                        <tr>
-                            <td>A1 Bakery</td>
-                            <td><span class="deal-stage stage-first-meeting">First Meeting</span></td>
-                            <td>$62,380</td>
-                            <td>30%</td>
-                            <td><span class="priority-moderate">Moderate</span></td>
-                            <td>1st call 10th Feb</td>
                         </tr>
                         <tr>
                             <td>Block Spirits</td>
-                            <td><span class="deal-stage stage-closed-won">Closed Won</span></td>
+                            <td><span class="deal-stage stage-closed-won">Won</span></td>
                             <td>$234,000</td>
-                            <td>100%</td>
                             <td>-</td>
-                            <td>Phase 2 & VIP editions</td>
-                        </tr>
-                        <tr>
-                            <td>Tomo Solutions</td>
-                            <td><span class="deal-stage stage-closed-won">Closed Won</span></td>
-                            <td>$464,100</td>
-                            <td>100%</td>
-                            <td>-</td>
-                            <td>Setup & 3 months quote</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             
-            <!-- NDN Shanghai Deals -->
             <div id="ndn-shanghai" class="entity-section">
-                <div class="pipeline-summary">
-                    <div class="summary-item">
-                        <div class="label">Pipeline Value</div>
-                        <div class="value">$1.05M</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Closed Won</div>
-                        <div class="value">$62K</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Closed Lost</div>
-                        <div class="value">2 deals</div>
-                    </div>
-                </div>
                 <table class="deals-table">
                     <thead>
                         <tr>
                             <th>Company</th>
                             <th>Status</th>
                             <th>Value</th>
-                            <th>Probability</th>
-                            <th>Priority</th>
-                            <th>Next Step</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -398,134 +413,29 @@
                             <td>IMC Trading</td>
                             <td><span class="deal-stage stage-quote-send">Quote Sent</span></td>
                             <td>$136,800</td>
-                            <td>70%</td>
-                            <td><span class="priority-moderate">Moderate</span></td>
-                            <td>Preparing China Marketing quote</td>
                         </tr>
                         <tr>
                             <td>TP.com</td>
                             <td><span class="deal-stage stage-quote-send">Quote Sent</span></td>
                             <td>$216,000</td>
-                            <td>50%</td>
-                            <td><span class="priority-moderate">Moderate</span></td>
-                            <td>Deck sent Jan 27</td>
-                        </tr>
-                        <tr>
-                            <td>ISC2</td>
-                            <td><span class="deal-stage stage-no-reply">No Reply</span></td>
-                            <td>$208,300</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>3 months plan quote shared</td>
-                        </tr>
-                        <tr>
-                            <td>Carmel School</td>
-                            <td><span class="deal-stage stage-no-reply">No Reply</span></td>
-                            <td>$133,200</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>Proposal sent 21 Jan</td>
-                        </tr>
-                        <tr>
-                            <td>HKRMA</td>
-                            <td><span class="deal-stage stage-no-reply">No Reply</span></td>
-                            <td>$105,500</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>Signify</td>
-                            <td><span class="deal-stage stage-no-reply">No Reply</span></td>
-                            <td>$88,000</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>Meeting Jan 29</td>
-                        </tr>
-                        <tr>
-                            <td>Swire Coca Cola</td>
-                            <td><span class="deal-stage stage-first-meeting">First Meeting</span></td>
-                            <td>-</td>
-                            <td>30%</td>
-                            <td><span class="priority-moderate">Moderate</span></td>
-                            <td>Meeting Friday Feb 13</td>
-                        </tr>
-                        <tr>
-                            <td>Steak King</td>
-                            <td><span class="deal-stage stage-first-meeting">First Meeting</span></td>
-                            <td>-</td>
-                            <td>30%</td>
-                            <td><span class="priority-low">Low</span></td>
-                            <td>26 Feb meeting</td>
-                        </tr>
-                        <tr>
-                            <td>Pret A Manger</td>
-                            <td><span class="deal-stage stage-closed-won">Closed Won</span></td>
-                            <td>$62,380</td>
-                            <td>100%</td>
-                            <td>-</td>
-                            <td>Jan XHS KOC</td>
-                        </tr>
-                        <tr>
-                            <td>VTC</td>
-                            <td><span class="deal-stage stage-closed-lost">Closed Lost</span></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>Awarded to another company (pricing)</td>
-                        </tr>
-                        <tr>
-                            <td>Barracuda</td>
-                            <td><span class="deal-stage stage-closed-lost">Closed Lost</span></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>Awarded to another company</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             
-            <!-- Trackbill Deals -->
             <div id="trackbill" class="entity-section">
-                <div class="pipeline-summary">
-                    <div class="summary-item">
-                        <div class="label">Pipeline Value</div>
-                        <div class="value">$0</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Active Deals</div>
-                        <div class="value">0</div>
-                    </div>
-                </div>
-                <div style="text-align: center; padding: 40px; color: #8892b0;">
-                    <p>No active deals yet. Add Trackbill deals to track them here.</p>
-                </div>
+                <p style="text-align: center; padding: 40px; color: var(--color-medium-teal);">No active deals yet.</p>
             </div>
             
-            <!-- YAS Deals -->
             <div id="yas" class="entity-section">
-                <div class="pipeline-summary">
-                    <div class="summary-item">
-                        <div class="label">Pipeline Value</div>
-                        <div class="value">$0</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Active Deals</div>
-                        <div class="value">0</div>
-                    </div>
-                </div>
-                <div style="text-align: center; padding: 40px; color: #8892b0;">
-                    <p>No active deals yet. Add YAS deals to track them here.</p>
-                </div>
+                <p style="text-align: center; padding: 40px; color: var(--color-medium-teal);">No active deals yet.</p>
             </div>
         </div>
         
-        <!-- Agent Fleet -->
         <div class="section">
-            <div class="section-title">Agent Fleet</div>
+            <div class="section-title">🤖 Agent Fleet</div>
             <div class="agents-grid">
-                <div class="agent-card completed">
+                <div class="agent-card">
                     <div class="agent-header">
                         <div class="agent-icon">🔍</div>
                         <div class="agent-info">
@@ -533,13 +443,11 @@
                             <div class="agent-status">● Completed</div>
                         </div>
                     </div>
-                    <div class="agent-task">DEXT competitive analysis report ready. Pricing, features, weaknesses mapped.</div>
-                    <div class="agent-actions">
-                        <button class="btn btn-secondary" onclick="alert('Report saved to workspace')">View Report</button>
-                    </div>
+                    <div class="agent-task">DEXT competitive analysis report ready.</div>
+                    <button class="btn btn-secondary">View Report</button>
                 </div>
                 
-                <div class="agent-card idle">
+                <div class="agent-card">
                     <div class="agent-header">
                         <div class="agent-icon">✍️</div>
                         <div class="agent-info">
@@ -547,10 +455,11 @@
                             <div class="agent-status">● Idle</div>
                         </div>
                     </div>
-                    <div class="agent-task">Drafts copy, blog posts, email sequences, and social content.</div>
+                    <div class="agent-task">Ready to draft copy, blogs, and emails.</div>
+                    <button class="btn btn-primary">Assign Task</button>
                 </div>
                 
-                <div class="agent-card idle">
+                <div class="agent-card">
                     <div class="agent-header">
                         <div class="agent-icon">🎯</div>
                         <div class="agent-info">
@@ -558,33 +467,19 @@
                             <div class="agent-status">● Idle</div>
                         </div>
                     </div>
-                    <div class="agent-task">Crafts pitches, handles objections, and strategizes deals.</div>
-                </div>
-                
-                <div class="agent-card idle">
-                    <div class="agent-header">
-                        <div class="agent-icon">📄</div>
-                        <div class="agent-info">
-                            <h3>Proposal Agent</h3>
-                            <div class="agent-status">● Idle</div>
-                        </div>
-                    </div>
-                    <div class="agent-task">Creates proposals, SOWs, pricing sheets, and contracts.</div>
+                    <div class="agent-task">Ready to craft pitches and strategies.</div>
+                    <button class="btn btn-primary">Assign Task</button>
                 </div>
             </div>
         </div>
         
-        <div class="last-updated">Last updated: March 2, 2026 | Data from Google Sheets</div>
+        <div class="last-updated">Last updated: March 2, 2026</div>
     </div>
     
     <script>
         function showEntity(entityId) {
-            document.querySelectorAll('.entity-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.querySelectorAll('.entity-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+            document.querySelectorAll('.entity-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(entityId).classList.add('active');
             event.target.classList.add('active');
         }
