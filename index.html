@@ -66,7 +66,6 @@
         .header-text h1 {
             font-size: 24px;
             font-weight: 600;
-            color: var(--color-deep-teal);
             letter-spacing: -0.5px;
         }
         .header-text .subtitle {
@@ -79,6 +78,14 @@
             gap: 8px;
             font-size: 13px;
             color: var(--color-medium-teal);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            background: var(--color-cream);
+            border: 1px solid var(--color-warm-cream);
+        }
+        .refresh-indicator:hover {
+            background: var(--color-light-teal);
         }
         .refresh-indicator.loading .spinner {
             animation: spin 1s linear infinite;
@@ -104,11 +111,6 @@
             padding: 28px;
             box-shadow: var(--shadow-soft);
             border: 1px solid var(--color-warm-cream);
-            transition: all 0.3s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-medium);
         }
         .stat-card .label {
             font-size: 13px;
@@ -121,7 +123,6 @@
         .stat-card .value {
             font-size: 36px;
             font-weight: 700;
-            color: var(--color-deep-teal);
             letter-spacing: -1px;
         }
         .section {
@@ -135,7 +136,6 @@
         .section-title {
             font-size: 20px;
             font-weight: 600;
-            color: var(--color-deep-teal);
             margin-bottom: 24px;
             display: flex;
             align-items: center;
@@ -192,7 +192,6 @@
         .deals-table td {
             padding: 18px 20px;
             border-bottom: 1px solid var(--color-warm-cream);
-            color: var(--color-deep-teal);
             font-weight: 500;
         }
         .deals-table tr:hover td {
@@ -225,20 +224,22 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .loading-state {
+        .loading-state, .error-state, .empty-state {
             text-align: center;
             padding: 60px;
-            color: var(--color-medium-teal);
         }
-        .error-state {
-            text-align: center;
-            padding: 60px;
-            color: var(--color-terracotta);
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px;
-            color: var(--color-medium-teal);
+        .loading-state { color: var(--color-medium-teal); }
+        .error-state { color: var(--color-terracotta); }
+        .error-state button {
+            margin-top: 16px;
+            padding: 12px 24px;
+            background: var(--color-accent-teal);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
         }
         .agents-grid {
             display: grid;
@@ -250,7 +251,6 @@
             border-radius: var(--radius-lg);
             padding: 28px;
             border: 1px solid var(--color-warm-cream);
-            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-soft);
@@ -281,7 +281,6 @@
         }
         .agent-info h3 {
             font-size: 18px;
-            color: var(--color-deep-teal);
             margin-bottom: 4px;
             font-weight: 600;
         }
@@ -311,9 +310,9 @@
                     <div class="subtitle">Joanne's Agent Fleet | NDN GROUP</div>
                 </div>
             </div>
-            <div class="refresh-indicator" id="refreshIndicator">
+            <div class="refresh-indicator" id="refreshIndicator" onclick="fetchData()">
                 <span class="spinner">↻</span>
-                <span id="refreshText">Loading data...</span>
+                <span id="refreshText">Click to load data</span>
             </div>
         </div>
     </header>
@@ -333,8 +332,8 @@
                 <div class="value" id="closedWon">$0</div>
             </div>
             <div class="stat-card">
-                <div class="label">Total Tabs</div>
-                <div class="value" id="totalTabs">3</div>
+                <div class="label">Total Deals</div>
+                <div class="value" id="grandTotal">0</div>
             </div>
         </div>
         
@@ -349,19 +348,19 @@
             
             <div id="ndn" class="entity-section active">
                 <div id="ndn-content">
-                    <div class="loading-state">Loading NDN deals...</div>
+                    <div class="loading-state">Click "Load Data" button above to fetch deals</div>
                 </div>
             </div>
             
             <div id="yas" class="entity-section">
                 <div id="yas-content">
-                    <div class="loading-state">Loading YAS deals...</div>
+                    <div class="loading-state">Click "Load Data" button above to fetch deals</div>
                 </div>
             </div>
             
             <div id="trackbill" class="entity-section">
                 <div id="trackbill-content">
-                    <div class="loading-state">Loading Trackbill deals...</div>
+                    <div class="loading-state">Click "Load Data" button above to fetch deals</div>
                 </div>
             </div>
         </div>
@@ -406,8 +405,13 @@
     </div>
     
     <script>
-        // Your Google Apps Script Web App URL
+        // IMPORTANT: This dashboard requires a CORS proxy to work with Google Apps Script
+        // Option 1: Use a proxy service (allorigins.win)
+        // Option 2: Deploy your own proxy
+        // Option 3: Use a backend server
+        
         const API_URL = 'https://script.google.com/macros/s/AKfycbzkc-u40NCUSg2u7ARxQBaqJ8hdknpfNxmwqbatbhttosudXxRVDJ6Qm_jFbWyPZ2oQaw/exec';
+        const PROXY_URL = 'https://api.allorigins.win/get?url=';
         
         let allData = { NDN: [], YAS: [], Trackbill: [] };
         
@@ -415,86 +419,77 @@
             const indicator = document.getElementById('refreshIndicator');
             const text = document.getElementById('refreshText');
             indicator.classList.add('loading');
-            text.textContent = 'Refreshing...';
+            text.textContent = 'Loading...';
             
             try {
-                // Using a CORS proxy
-                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(API_URL);
-                const response = await fetch(proxyUrl);
+                // Try with CORS proxy
+                const response = await fetch(PROXY_URL + encodeURIComponent(API_URL));
+                
+                if (!response.ok) {
+                    throw new Error('Proxy error: ' + response.status);
+                }
+                
                 const data = await response.json();
                 
-                // Parse the JSON from the proxy response
-                allData = JSON.parse(data.contents);
+                // allorigins wraps the response in "contents"
+                if (data.contents) {
+                    allData = JSON.parse(data.contents);
+                } else {
+                    allData = data;
+                }
+                
+                console.log('Loaded data:', allData);
                 
                 updateDashboard();
                 updateTimestamp();
                 
-                text.textContent = 'Live data';
+                text.textContent = 'Data loaded! Click to refresh';
             } catch (error) {
-                console.error('Error fetching data:', error);
-                text.textContent = 'Error loading data';
-                showError();
+                console.error('Error:', error);
+                text.textContent = 'Error - Click to retry';
+                showError(error.message);
             } finally {
                 indicator.classList.remove('loading');
             }
         }
         
         function updateDashboard() {
-            // Update tab counts
-            const ndnCount = allData.NDN ? allData.NDN.length : 0;
-            const yasCount = allData.YAS ? allData.YAS.length : 0;
-            const trackbillCount = allData.Trackbill ? allData.Trackbill.length : 0;
-            const totalDeals = ndnCount + yasCount + trackbillCount;
+            // Get counts
+            const ndnCount = allData.NDN?.length || 0;
+            const yasCount = allData.YAS?.length || 0;
+            const trackbillCount = allData.Trackbill?.length || 0;
+            const grandTotal = allData.grandTotal || (ndnCount + yasCount + trackbillCount);
             
+            // Update tabs
             document.getElementById('tab-ndn').textContent = `NDN (${ndnCount})`;
             document.getElementById('tab-yas').textContent = `YAS (${yasCount})`;
             document.getElementById('tab-trackbill').textContent = `Trackbill (${trackbillCount})`;
             
-            // Calculate stats from all deals
+            // Calculate stats
             let totalPipeline = 0;
             let wonValue = 0;
-            let wonCount = 0;
             
-            // Process NDN deals
-            if (allData.NDN) {
-                allData.NDN.forEach(deal => {
-                    const value = parseFloat(deal.quotationValue?.toString().replace(/[^0-9.-]+/g, '')) || 0;
-                    totalPipeline += value;
-                    if (deal.status && deal.status.toLowerCase().includes('won')) {
-                        wonValue += value;
-                        wonCount++;
+            // Process all deals
+            [...(allData.NDN || []), ...(allData.YAS || []), ...(allData.Trackbill || [])].forEach(deal => {
+                const val = parseFloat(deal.quotationValue);
+                if (!isNaN(val) && val > 0) {
+                    totalPipeline += val;
+                }
+                
+                const status = (deal.status || '').toLowerCase();
+                if (status.includes('won') || status.includes('completed')) {
+                    const won = parseFloat(deal.wonDeals) || val;
+                    if (!isNaN(won)) {
+                        wonValue += won;
                     }
-                });
-            }
-            
-            // Process YAS deals
-            if (allData.YAS) {
-                allData.YAS.forEach(deal => {
-                    const value = parseFloat(deal.quotationValue?.toString().replace(/[^0-9.-]+/g, '')) || 0;
-                    totalPipeline += value;
-                    if (deal.status && deal.status.toLowerCase().includes('won')) {
-                        wonValue += value;
-                        wonCount++;
-                    }
-                });
-            }
-            
-            // Process Trackbill deals
-            if (allData.Trackbill) {
-                allData.Trackbill.forEach(deal => {
-                    const value = parseFloat(deal.quotationValue?.toString().replace(/[^0-9.-]+/g, '')) || 0;
-                    totalPipeline += value;
-                    if (deal.status && deal.status.toLowerCase().includes('won')) {
-                        wonValue += value;
-                        wonCount++;
-                    }
-                });
-            }
+                }
+            });
             
             // Update stats
             document.getElementById('totalPipeline').textContent = '$' + (totalPipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('activeDeals').textContent = totalDeals;
+            document.getElementById('activeDeals').textContent = grandTotal;
             document.getElementById('closedWon').textContent = '$' + (wonValue / 1000).toFixed(0) + 'K';
+            document.getElementById('grandTotal').textContent = grandTotal;
             
             // Render tables
             renderTable('ndn-content', allData.NDN || []);
@@ -506,7 +501,7 @@
             const container = document.getElementById(containerId);
             
             if (!deals || deals.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>No deals found in this tab.</p></div>';
+                container.innerHTML = '<div class="empty-state"><p>No deals found.</p></div>';
                 return;
             }
             
@@ -527,8 +522,8 @@
                             <tr>
                                 <td>${deal.task || '-'}</td>
                                 <td>${getStatusBadge(deal.status)}</td>
-                                <td>${deal.quotationValue || '-'}</td>
-                                <td>${deal.closingProbability || '-'}</td>
+                                <td>${formatCurrency(deal.quotationValue)}</td>
+                                <td>${formatProbability(deal.closingProbability)}</td>
                                 <td>${getPriorityBadge(deal.priority)}</td>
                                 <td>${deal.nextStep || '-'}</td>
                             </tr>
@@ -538,6 +533,23 @@
             `;
             
             container.innerHTML = html;
+        }
+        
+        function formatCurrency(value) {
+            if (!value || value === '') return '-';
+            const num = parseFloat(value);
+            if (isNaN(num)) return value;
+            if (num >= 1000000) return '$' + (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return '$' + (num / 1000).toFixed(0) + 'K';
+            return '$' + num.toLocaleString();
+        }
+        
+        function formatProbability(value) {
+            if (!value || value === '') return '-';
+            if (typeof value === 'string' && value.toLowerCase().includes('closed')) return value;
+            const num = parseFloat(value);
+            if (isNaN(num)) return value;
+            return (num * 100).toFixed(0) + '%';
         }
         
         function getStatusBadge(status) {
@@ -563,10 +575,17 @@
             return priority;
         }
         
-        function showError() {
-            document.getElementById('ndn-content').innerHTML = '<div class="error-state">Failed to load data. Please check your Google Apps Script deployment.</div>';
-            document.getElementById('yas-content').innerHTML = '<div class="error-state">Failed to load data.</div>';
-            document.getElementById('trackbill-content').innerHTML = '<div class="error-state">Failed to load data.</div>';
+        function showError(message) {
+            const errorHtml = `
+                <div class="error-state">
+                    <p>Failed to load data</p>
+                    <p style="font-size: 13px; margin-top: 8px;">${message}</p>
+                    <button onclick="fetchData()">Retry</button>
+                </div>
+            `;
+            document.getElementById('ndn-content').innerHTML = errorHtml;
+            document.getElementById('yas-content').innerHTML = errorHtml;
+            document.getElementById('trackbill-content').innerHTML = errorHtml;
         }
         
         function updateTimestamp() {
@@ -580,12 +599,6 @@
             document.getElementById(entityId).classList.add('active');
             event.target.classList.add('active');
         }
-        
-        // Load data on page load
-        fetchData();
-        
-        // Auto-refresh every 5 minutes
-        setInterval(fetchData, 5 * 60 * 1000);
     </script>
 </body>
 </html>
