@@ -213,6 +213,7 @@
         .stage-no-reply { background: var(--color-warm-cream); color: var(--color-medium-teal); }
         .stage-first-meeting { background: linear-gradient(135deg, #dbeafe, rgba(219, 234, 254, 0.5)); color: #2563eb; }
         .stage-paused { background: var(--color-warm-cream); color: var(--color-medium-teal); }
+        .stage-completed { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
         .stage-closed-won { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
         .stage-closed-lost { background: linear-gradient(135deg, #fee2e2, rgba(254, 226, 226, 0.5)); color: #dc2626; }
         .priority-high { color: var(--color-terracotta); font-weight: 600; }
@@ -233,6 +234,11 @@
             text-align: center;
             padding: 60px;
             color: var(--color-terracotta);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--color-medium-teal);
         }
         .agents-grid {
             display: grid;
@@ -327,8 +333,8 @@
                 <div class="value" id="closedWon">$0</div>
             </div>
             <div class="stat-card">
-                <div class="label">Win Rate</div>
-                <div class="value" id="winRate">0%</div>
+                <div class="label">Total Tabs</div>
+                <div class="value" id="totalTabs">3</div>
             </div>
         </div>
         
@@ -337,29 +343,26 @@
             
             <div class="entity-tabs">
                 <button class="entity-tab active" onclick="showEntity('ndn')" id="tab-ndn">NDN (0)</button>
-                <button class="entity-tab" onclick="showEntity('ndn-shanghai')" id="tab-ndn-shanghai">NDN Shanghai (0)</button>
-                <button class="entity-tab" onclick="showEntity('trackbill')" id="tab-trackbill">Trackbill (0)</button>
                 <button class="entity-tab" onclick="showEntity('yas')" id="tab-yas">YAS (0)</button>
+                <button class="entity-tab" onclick="showEntity('trackbill')" id="tab-trackbill">Trackbill (0)</button>
             </div>
             
             <div id="ndn" class="entity-section active">
                 <div id="ndn-content">
-                    <div class="loading-state">Loading deals...</div>
+                    <div class="loading-state">Loading NDN deals...</div>
                 </div>
             </div>
             
-            <div id="ndn-shanghai" class="entity-section">
-                <div id="ndn-shanghai-content">
-                    <div class="loading-state">Loading deals...</div>
+            <div id="yas" class="entity-section">
+                <div id="yas-content">
+                    <div class="loading-state">Loading YAS deals...</div>
                 </div>
             </div>
             
             <div id="trackbill" class="entity-section">
-                <p style="text-align: center; padding: 40px; color: var(--color-medium-teal);">No active deals yet.</p>
-            </div>
-            
-            <div id="yas" class="entity-section">
-                <p style="text-align: center; padding: 40px; color: var(--color-medium-teal);">No active deals yet.</p>
+                <div id="trackbill-content">
+                    <div class="loading-state">Loading Trackbill deals...</div>
+                </div>
             </div>
         </div>
         
@@ -376,7 +379,6 @@
                     </div>
                     <div>DEXT competitive analysis report ready.</div>
                 </div>
-                
                 <div class="agent-card">
                     <div class="agent-header">
                         <div class="agent-icon">✍️</div>
@@ -387,7 +389,6 @@
                     </div>
                     <div>Ready to draft copy, blogs, and emails.</div>
                 </div>
-                
                 <div class="agent-card">
                     <div class="agent-header">
                         <div class="agent-icon">🎯</div>
@@ -406,9 +407,9 @@
     
     <script>
         // Your Google Apps Script Web App URL
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzjth8jRUP1SfYbSXXrdvgKB7DD2WNuTrjM9XRMNMjW7u3yz-oucw45TOs2p476Kiz3bQ/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzkc-u40NCUSg2u7ARxQBaqJ8hdknpfNxmwqbatbhttosudXxRVDJ6Qm_jFbWyPZ2oQaw/exec';
         
-        let allDeals = [];
+        let allData = { NDN: [], YAS: [], Trackbill: [] };
         
         async function fetchData() {
             const indicator = document.getElementById('refreshIndicator');
@@ -417,13 +418,13 @@
             text.textContent = 'Refreshing...';
             
             try {
-                // Using a CORS proxy since Google Apps Script doesn't support CORS by default
+                // Using a CORS proxy
                 const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(API_URL);
                 const response = await fetch(proxyUrl);
                 const data = await response.json();
                 
                 // Parse the JSON from the proxy response
-                allDeals = JSON.parse(data.contents);
+                allData = JSON.parse(data.contents);
                 
                 updateDashboard();
                 updateTimestamp();
@@ -439,35 +440,73 @@
         }
         
         function updateDashboard() {
-            // Categorize deals
-            const ndnDeals = allDeals.filter(d => d.venture === 'NDN');
-            const ndnShanghaiDeals = allDeals.filter(d => d.venture === 'NDN Shanghai');
+            // Update tab counts
+            const ndnCount = allData.NDN ? allData.NDN.length : 0;
+            const yasCount = allData.YAS ? allData.YAS.length : 0;
+            const trackbillCount = allData.Trackbill ? allData.Trackbill.length : 0;
+            const totalDeals = ndnCount + yasCount + trackbillCount;
             
-            // Update tabs
-            document.getElementById('tab-ndn').textContent = `NDN (${ndnDeals.length})`;
-            document.getElementById('tab-ndn-shanghai').textContent = `NDN Shanghai (${ndnShanghaiDeals.length})`;
+            document.getElementById('tab-ndn').textContent = `NDN (${ndnCount})`;
+            document.getElementById('tab-yas').textContent = `YAS (${yasCount})`;
+            document.getElementById('tab-trackbill').textContent = `Trackbill (${trackbillCount})`;
+            
+            // Calculate stats from all deals
+            let totalPipeline = 0;
+            let wonValue = 0;
+            let wonCount = 0;
+            
+            // Process NDN deals
+            if (allData.NDN) {
+                allData.NDN.forEach(deal => {
+                    const value = parseFloat(deal.quotationValue?.toString().replace(/[^0-9.-]+/g, '')) || 0;
+                    totalPipeline += value;
+                    if (deal.status && deal.status.toLowerCase().includes('won')) {
+                        wonValue += value;
+                        wonCount++;
+                    }
+                });
+            }
+            
+            // Process YAS deals
+            if (allData.YAS) {
+                allData.YAS.forEach(deal => {
+                    const value = parseFloat(deal.quotationValue?.toString().replace(/[^0-9.-]+/g, '')) || 0;
+                    totalPipeline += value;
+                    if (deal.status && deal.status.toLowerCase().includes('won')) {
+                        wonValue += value;
+                        wonCount++;
+                    }
+                });
+            }
+            
+            // Process Trackbill deals
+            if (allData.Trackbill) {
+                allData.Trackbill.forEach(deal => {
+                    const value = parseFloat(deal.quotationValue?.toString().replace(/[^0-9.-]+/g, '')) || 0;
+                    totalPipeline += value;
+                    if (deal.status && deal.status.toLowerCase().includes('won')) {
+                        wonValue += value;
+                        wonCount++;
+                    }
+                });
+            }
             
             // Update stats
-            const totalPipeline = allDeals.reduce((sum, d) => sum + (parseFloat(d.quotationValue?.replace(/[^0-9.-]+/g, '')) || 0), 0);
-            const wonDeals = allDeals.filter(d => d.status?.toLowerCase().includes('won'));
-            const wonValue = wonDeals.reduce((sum, d) => sum + (parseFloat(d.wonDeals?.replace(/[^0-9.-]+/g, '')) || 0), 0);
-            const winRate = allDeals.length > 0 ? (wonDeals.length / allDeals.length * 100).toFixed(1) : 0;
-            
             document.getElementById('totalPipeline').textContent = '$' + (totalPipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('activeDeals').textContent = allDeals.length;
+            document.getElementById('activeDeals').textContent = totalDeals;
             document.getElementById('closedWon').textContent = '$' + (wonValue / 1000).toFixed(0) + 'K';
-            document.getElementById('winRate').textContent = winRate + '%';
             
             // Render tables
-            renderTable('ndn-content', ndnDeals);
-            renderTable('ndn-shanghai-content', ndnShanghaiDeals);
+            renderTable('ndn-content', allData.NDN || []);
+            renderTable('yas-content', allData.YAS || []);
+            renderTable('trackbill-content', allData.Trackbill || []);
         }
         
         function renderTable(containerId, deals) {
             const container = document.getElementById(containerId);
             
-            if (deals.length === 0) {
-                container.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--color-medium-teal);">No deals found.</p>';
+            if (!deals || deals.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No deals found in this tab.</p></div>';
                 return;
             }
             
@@ -478,6 +517,7 @@
                             <th>Company</th>
                             <th>Status</th>
                             <th>Value</th>
+                            <th>Probability</th>
                             <th>Priority</th>
                             <th>Next Step</th>
                         </tr>
@@ -488,6 +528,7 @@
                                 <td>${deal.task || '-'}</td>
                                 <td>${getStatusBadge(deal.status)}</td>
                                 <td>${deal.quotationValue || '-'}</td>
+                                <td>${deal.closingProbability || '-'}</td>
                                 <td>${getPriorityBadge(deal.priority)}</td>
                                 <td>${deal.nextStep || '-'}</td>
                             </tr>
@@ -508,6 +549,8 @@
             if (s.includes('quote')) return '<span class="deal-stage stage-quote-send">Quote Sent</span>';
             if (s.includes('meeting')) return '<span class="deal-stage stage-first-meeting">First Meeting</span>';
             if (s.includes('paused')) return '<span class="deal-stage stage-paused">Paused</span>';
+            if (s.includes('completed')) return '<span class="deal-stage stage-completed">Completed</span>';
+            if (s.includes('no reply')) return '<span class="deal-stage stage-no-reply">No Reply</span>';
             return '<span class="deal-stage stage-no-reply">' + status + '</span>';
         }
         
@@ -521,8 +564,9 @@
         }
         
         function showError() {
-            document.getElementById('ndn-content').innerHTML = '<div class="error-state">Failed to load data. Please refresh.</div>';
-            document.getElementById('ndn-shanghai-content').innerHTML = '<div class="error-state">Failed to load data. Please refresh.</div>';
+            document.getElementById('ndn-content').innerHTML = '<div class="error-state">Failed to load data. Please check your Google Apps Script deployment.</div>';
+            document.getElementById('yas-content').innerHTML = '<div class="error-state">Failed to load data.</div>';
+            document.getElementById('trackbill-content').innerHTML = '<div class="error-state">Failed to load data.</div>';
         }
         
         function updateTimestamp() {
