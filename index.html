@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission Control | Joanne's Agent Fleet</title>
+    <title>Mission Control | Live Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Perplexity Brand Colors */
             --color-deep-teal: #091717;
             --color-dark-teal: #13343B;
             --color-medium-teal: #2E565D;
@@ -18,7 +17,6 @@
             --color-warm-cream: #E5E3D4;
             --color-peach: #FFD2A6;
             --color-terracotta: #A94B30;
-            --color-muted-red: #954456;
             --shadow-soft: 0 4px 20px rgba(9, 23, 23, 0.08);
             --shadow-medium: 0 8px 30px rgba(9, 23, 23, 0.12);
             --radius-sm: 8px;
@@ -74,6 +72,20 @@
         .header-text .subtitle {
             font-size: 14px;
             color: var(--color-medium-teal);
+        }
+        .refresh-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--color-medium-teal);
+        }
+        .refresh-indicator.loading .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         .container {
             max-width: 1400px;
@@ -212,6 +224,16 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .loading-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--color-medium-teal);
+        }
+        .error-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--color-terracotta);
+        }
         .agents-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -226,10 +248,6 @@
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-soft);
-        }
-        .agent-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-medium);
         }
         .agent-card::before {
             content: '';
@@ -267,59 +285,13 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
-        .agent-status::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--color-accent-teal);
-        }
-        .agent-task {
-            font-size: 14px;
-            color: var(--color-medium-teal);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        .btn {
-            padding: 10px 18px;
-            border-radius: var(--radius-md);
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--color-accent-teal), var(--color-bright-teal));
-            color: white;
-            box-shadow: var(--shadow-soft);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-medium); }
-        .btn-secondary {
-            background: var(--color-cream);
-            color: var(--color-medium-teal);
-            border: 1px solid var(--color-warm-cream);
-        }
-        .btn-secondary:hover { background: var(--color-warm-cream); color: var(--color-deep-teal); }
         .last-updated {
             text-align: center;
             color: var(--color-medium-teal);
             font-size: 13px;
             margin-top: 40px;
             padding: 20px;
-        }
-        @media (max-width: 1024px) {
-            .stats-bar { grid-template-columns: repeat(2, 1fr); }
-            .container { padding: 24px; }
-        }
-        @media (max-width: 768px) {
-            .stats-bar { grid-template-columns: 1fr; }
-            .header-content { flex-direction: column; gap: 16px; text-align: center; }
         }
     </style>
 </head>
@@ -333,6 +305,10 @@
                     <div class="subtitle">Joanne's Agent Fleet | NDN GROUP</div>
                 </div>
             </div>
+            <div class="refresh-indicator" id="refreshIndicator">
+                <span class="spinner">↻</span>
+                <span id="refreshText">Loading data...</span>
+            </div>
         </div>
     </header>
     
@@ -340,19 +316,19 @@
         <div class="stats-bar">
             <div class="stat-card">
                 <div class="label">Total Pipeline</div>
-                <div class="value">$5.6M</div>
+                <div class="value" id="totalPipeline">$0</div>
             </div>
             <div class="stat-card">
                 <div class="label">Active Deals</div>
-                <div class="value">19</div>
+                <div class="value" id="activeDeals">0</div>
             </div>
             <div class="stat-card">
                 <div class="label">Closed Won</div>
-                <div class="value">$761K</div>
+                <div class="value" id="closedWon">$0</div>
             </div>
             <div class="stat-card">
                 <div class="label">Win Rate</div>
-                <div class="value">19.8%</div>
+                <div class="value" id="winRate">0%</div>
             </div>
         </div>
         
@@ -360,67 +336,22 @@
             <div class="section-title">💼 Deal Pipeline</div>
             
             <div class="entity-tabs">
-                <button class="entity-tab active" onclick="showEntity('ndn')">NDN (7)</button>
-                <button class="entity-tab" onclick="showEntity('ndn-shanghai')">NDN Shanghai (10)</button>
-                <button class="entity-tab" onclick="showEntity('trackbill')">Trackbill (0)</button>
-                <button class="entity-tab" onclick="showEntity('yas')">YAS (0)</button>
+                <button class="entity-tab active" onclick="showEntity('ndn')" id="tab-ndn">NDN (0)</button>
+                <button class="entity-tab" onclick="showEntity('ndn-shanghai')" id="tab-ndn-shanghai">NDN Shanghai (0)</button>
+                <button class="entity-tab" onclick="showEntity('trackbill')" id="tab-trackbill">Trackbill (0)</button>
+                <button class="entity-tab" onclick="showEntity('yas')" id="tab-yas">YAS (0)</button>
             </div>
             
             <div id="ndn" class="entity-section active">
-                <table class="deals-table">
-                    <thead>
-                        <tr>
-                            <th>Company</th>
-                            <th>Status</th>
-                            <th>Value</th>
-                            <th>Priority</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Ocean Park</td>
-                            <td><span class="deal-stage stage-in-progress">In Progress</span></td>
-                            <td>$500,000</td>
-                            <td><span class="priority-low">Low</span></td>
-                        </tr>
-                        <tr>
-                            <td>Armor Capital</td>
-                            <td><span class="deal-stage stage-in-progress">In Progress</span></td>
-                            <td>$1,056,000</td>
-                            <td><span class="priority-high">High</span></td>
-                        </tr>
-                        <tr>
-                            <td>Block Spirits</td>
-                            <td><span class="deal-stage stage-closed-won">Won</span></td>
-                            <td>$234,000</td>
-                            <td>-</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="ndn-content">
+                    <div class="loading-state">Loading deals...</div>
+                </div>
             </div>
             
             <div id="ndn-shanghai" class="entity-section">
-                <table class="deals-table">
-                    <thead>
-                        <tr>
-                            <th>Company</th>
-                            <th>Status</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>IMC Trading</td>
-                            <td><span class="deal-stage stage-quote-send">Quote Sent</span></td>
-                            <td>$136,800</td>
-                        </tr>
-                        <tr>
-                            <td>TP.com</td>
-                            <td><span class="deal-stage stage-quote-send">Quote Sent</span></td>
-                            <td>$216,000</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="ndn-shanghai-content">
+                    <div class="loading-state">Loading deals...</div>
+                </div>
             </div>
             
             <div id="trackbill" class="entity-section">
@@ -440,11 +371,10 @@
                         <div class="agent-icon">🔍</div>
                         <div class="agent-info">
                             <h3>Research Agent</h3>
-                            <div class="agent-status">● Completed</div>
+                            <div class="agent-status">● COMPLETED</div>
                         </div>
                     </div>
-                    <div class="agent-task">DEXT competitive analysis report ready.</div>
-                    <button class="btn btn-secondary">View Report</button>
+                    <div>DEXT competitive analysis report ready.</div>
                 </div>
                 
                 <div class="agent-card">
@@ -452,11 +382,10 @@
                         <div class="agent-icon">✍️</div>
                         <div class="agent-info">
                             <h3>Content Agent</h3>
-                            <div class="agent-status">● Idle</div>
+                            <div class="agent-status">● IDLE</div>
                         </div>
                     </div>
-                    <div class="agent-task">Ready to draft copy, blogs, and emails.</div>
-                    <button class="btn btn-primary">Assign Task</button>
+                    <div>Ready to draft copy, blogs, and emails.</div>
                 </div>
                 
                 <div class="agent-card">
@@ -464,25 +393,155 @@
                         <div class="agent-icon">🎯</div>
                         <div class="agent-info">
                             <h3>Sales Agent</h3>
-                            <div class="agent-status">● Idle</div>
+                            <div class="agent-status">● IDLE</div>
                         </div>
                     </div>
-                    <div class="agent-task">Ready to craft pitches and strategies.</div>
-                    <button class="btn btn-primary">Assign Task</button>
+                    <div>Ready to craft pitches and strategies.</div>
                 </div>
             </div>
         </div>
         
-        <div class="last-updated">Last updated: March 2, 2026</div>
+        <div class="last-updated" id="lastUpdated">Last updated: Never</div>
     </div>
     
     <script>
+        // Your Google Apps Script Web App URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzjth8jRUP1SfYbSXXrdvgKB7DD2WNuTrjM9XRMNMjW7u3yz-oucw45TOs2p476Kiz3bQ/exec';
+        
+        let allDeals = [];
+        
+        async function fetchData() {
+            const indicator = document.getElementById('refreshIndicator');
+            const text = document.getElementById('refreshText');
+            indicator.classList.add('loading');
+            text.textContent = 'Refreshing...';
+            
+            try {
+                // Using a CORS proxy since Google Apps Script doesn't support CORS by default
+                const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(API_URL);
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                // Parse the JSON from the proxy response
+                allDeals = JSON.parse(data.contents);
+                
+                updateDashboard();
+                updateTimestamp();
+                
+                text.textContent = 'Live data';
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                text.textContent = 'Error loading data';
+                showError();
+            } finally {
+                indicator.classList.remove('loading');
+            }
+        }
+        
+        function updateDashboard() {
+            // Categorize deals
+            const ndnDeals = allDeals.filter(d => d.venture === 'NDN');
+            const ndnShanghaiDeals = allDeals.filter(d => d.venture === 'NDN Shanghai');
+            
+            // Update tabs
+            document.getElementById('tab-ndn').textContent = `NDN (${ndnDeals.length})`;
+            document.getElementById('tab-ndn-shanghai').textContent = `NDN Shanghai (${ndnShanghaiDeals.length})`;
+            
+            // Update stats
+            const totalPipeline = allDeals.reduce((sum, d) => sum + (parseFloat(d.quotationValue?.replace(/[^0-9.-]+/g, '')) || 0), 0);
+            const wonDeals = allDeals.filter(d => d.status?.toLowerCase().includes('won'));
+            const wonValue = wonDeals.reduce((sum, d) => sum + (parseFloat(d.wonDeals?.replace(/[^0-9.-]+/g, '')) || 0), 0);
+            const winRate = allDeals.length > 0 ? (wonDeals.length / allDeals.length * 100).toFixed(1) : 0;
+            
+            document.getElementById('totalPipeline').textContent = '$' + (totalPipeline / 1000000).toFixed(2) + 'M';
+            document.getElementById('activeDeals').textContent = allDeals.length;
+            document.getElementById('closedWon').textContent = '$' + (wonValue / 1000).toFixed(0) + 'K';
+            document.getElementById('winRate').textContent = winRate + '%';
+            
+            // Render tables
+            renderTable('ndn-content', ndnDeals);
+            renderTable('ndn-shanghai-content', ndnShanghaiDeals);
+        }
+        
+        function renderTable(containerId, deals) {
+            const container = document.getElementById(containerId);
+            
+            if (deals.length === 0) {
+                container.innerHTML = '<p style="text-align: center; padding: 40px; color: var(--color-medium-teal);">No deals found.</p>';
+                return;
+            }
+            
+            const html = `
+                <table class="deals-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Value</th>
+                            <th>Priority</th>
+                            <th>Next Step</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${deals.map(deal => `
+                            <tr>
+                                <td>${deal.task || '-'}</td>
+                                <td>${getStatusBadge(deal.status)}</td>
+                                <td>${deal.quotationValue || '-'}</td>
+                                <td>${getPriorityBadge(deal.priority)}</td>
+                                <td>${deal.nextStep || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function getStatusBadge(status) {
+            if (!status) return '<span class="deal-stage stage-no-reply">Unknown</span>';
+            const s = status.toLowerCase();
+            if (s.includes('won')) return '<span class="deal-stage stage-closed-won">Won</span>';
+            if (s.includes('lost')) return '<span class="deal-stage stage-closed-lost">Lost</span>';
+            if (s.includes('progress')) return '<span class="deal-stage stage-in-progress">In Progress</span>';
+            if (s.includes('quote')) return '<span class="deal-stage stage-quote-send">Quote Sent</span>';
+            if (s.includes('meeting')) return '<span class="deal-stage stage-first-meeting">First Meeting</span>';
+            if (s.includes('paused')) return '<span class="deal-stage stage-paused">Paused</span>';
+            return '<span class="deal-stage stage-no-reply">' + status + '</span>';
+        }
+        
+        function getPriorityBadge(priority) {
+            if (!priority) return '-';
+            const p = priority.toLowerCase();
+            if (p.includes('high')) return '<span class="priority-high">High</span>';
+            if (p.includes('moderate')) return '<span class="priority-moderate">Moderate</span>';
+            if (p.includes('low')) return '<span class="priority-low">Low</span>';
+            return priority;
+        }
+        
+        function showError() {
+            document.getElementById('ndn-content').innerHTML = '<div class="error-state">Failed to load data. Please refresh.</div>';
+            document.getElementById('ndn-shanghai-content').innerHTML = '<div class="error-state">Failed to load data. Please refresh.</div>';
+        }
+        
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 'Last updated: ' + now.toLocaleString();
+        }
+        
         function showEntity(entityId) {
             document.querySelectorAll('.entity-section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
             document.getElementById(entityId).classList.add('active');
             event.target.classList.add('active');
         }
+        
+        // Load data on page load
+        fetchData();
+        
+        // Auto-refresh every 5 minutes
+        setInterval(fetchData, 5 * 60 * 1000);
     </script>
 </body>
 </html>
