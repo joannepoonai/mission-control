@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control | Live Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-deep-teal: #091717;
+            --color-medium-teal: #2E565D;
+            --color-accent-teal: #218090;
+            --color-bright-teal: #20B8CD;
+            --color-light-teal: #BADFDE;
+            --color-cream: #FCFAF6;
+            --color-warm-cream: #E5E3D4;
+            --color-peach: #FFD2A6;
+            --color-terracotta: #A94B30;
+            --shadow-soft: 0 4px 20px rgba(9, 23, 23, 0.08);
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--color-cream);
+            min-height: 100vh;
+            color: var(--color-deep-teal);
+        }
+        .header {
+            background: var(--color-cream);
+            padding: 24px 48px;
+            border-bottom: 1px solid var(--color-warm-cream);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--color-accent-teal), var(--color-bright-teal));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        .header-text h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header-text .subtitle {
+            font-size: 14px;
+            color: var(--color-medium-teal);
+        }
+        .refresh-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--color-medium-teal);
+            cursor: pointer;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+        }
+        .refresh-indicator:hover {
+            background: var(--color-light-teal);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 48px;
+        }
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--color-warm-cream);
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--color-medium-teal);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        .section {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--color-warm-cream);
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .entity-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 28px;
+            padding: 6px;
+            background: var(--color-cream);
+            border-radius: var(--radius-xl);
+            width: fit-content;
+        }
+        .entity-tab {
+            padding: 12px 24px;
+            border-radius: var(--radius-lg);
+            background: transparent;
+            color: var(--color-medium-teal);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+            border: none;
+            font-family: inherit;
+        }
+        .entity-tab.active {
+            background: white;
+            color: var(--color-deep-teal);
+            box-shadow: var(--shadow-soft);
+            font-weight: 600;
+        }
+        .deals-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+        .deals-table th {
+            text-align: left;
+            padding: 16px 20px;
+            color: var(--color-medium-teal);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-bottom: 2px solid var(--color-warm-cream);
+            background: var(--color-cream);
+        }
+        .deals-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--color-warm-cream);
+            font-weight: 500;
+        }
+        .deals-table tr:hover td {
+            background: rgba(186, 223, 222, 0.2);
+        }
+        .deal-stage {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .stage-in-progress { background: linear-gradient(135deg, var(--color-light-teal), rgba(186, 223, 222, 0.5)); color: var(--color-medium-teal); }
+        .stage-quote-send { background: linear-gradient(135deg, var(--color-peach), rgba(255, 210, 166, 0.5)); color: var(--color-terracotta); }
+        .stage-no-reply { background: var(--color-warm-cream); color: var(--color-medium-teal); }
+        .stage-first-meeting { background: linear-gradient(135deg, #dbeafe, rgba(219, 234, 254, 0.5)); color: #2563eb; }
+        .stage-paused { background: var(--color-warm-cream); color: var(--color-medium-teal); }
+        .stage-completed { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
+        .stage-closed-won { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
+        .stage-closed-lost { background: linear-gradient(135deg, #fee2e2, rgba(254, 226, 226, 0.5)); color: #dc2626; }
+        .priority-high { color: var(--color-terracotta); font-weight: 600; }
+        .priority-moderate { color: #d97706; font-weight: 500; }
+        .priority-low { color: var(--color-medium-teal); font-weight: 500; }
+        .entity-section { display: none; }
+        .entity-section.active { display: block; }
+        .loading-state, .error-state, .empty-state {
+            text-align: center;
+            padding: 60px;
+        }
+        .loading-state { color: var(--color-medium-teal); }
+        .error-state { color: var(--color-terracotta); }
+        .empty-state { color: var(--color-medium-teal); }
+        .last-updated {
+            text-align: center;
+            color: var(--color-medium-teal);
+            font-size: 13px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-brand">
+                <div class="header-logo">🎯</div>
+                <div class="header-text">
+                    <h1>Mission Control</h1>
+                    <div class="subtitle">Joanne's Agent Fleet | NDN GROUP</div>
+                </div>
+            </div>
+            <div class="refresh-indicator" onclick="loadData()">
+                <span>↻</span>
+                <span id="refreshText">Click to refresh</span>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="label">Total Pipeline</div>
+                <div class="value" id="totalPipeline">$0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Active Deals</div>
+                <div class="value" id="activeDeals">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Closed Won</div>
+                <div class="value" id="closedWon">$0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Deals</div>
+                <div class="value" id="grandTotal">0</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">💼 Deal Pipeline</div>
+            
+            <div class="entity-tabs">
+                <button class="entity-tab active" onclick="showEntity('all')" id="tab-all">All (0)</button>
+                <button class="entity-tab" onclick="showEntity('ndn')" id="tab-ndn">NDN (0)</button>
+                <button class="entity-tab" onclick="showEntity('ndn-shanghai')" id="tab-ndn-shanghai">NDN Shanghai (0)</button>
+                <button class="entity-tab" onclick="showEntity('yas')" id="tab-yas">YAS (0)</button>
+                <button class="entity-tab" onclick="showEntity('trackbill')" id="tab-trackbill">Trackbill (0)</button>
+            </div>
+            
+            <div id="all" class="entity-section active">
+                <div id="all-content"><div class="loading-state">Loading data...</div></div>
+            </div>
+            
+            <div id="ndn" class="entity-section">
+                <div id="ndn-content"><div class="loading-state">Loading...</div></div>
+            </div>
+            
+            <div id="ndn-shanghai" class="entity-section">
+                <div id="ndn-shanghai-content"><div class="loading-state">Loading...</div></div>
+            </div>
+            
+            <div id="yas" class="entity-section">
+                <div id="yas-content"><div class="loading-state">Loading...</div></div>
+            </div>
+            
+            <div id="trackbill" class="entity-section">
+                <div id="trackbill-content"><div class="loading-state">No data yet</div></div>
+            </div>
+        </div>
+        
+        <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+    </div>
+    
+    <script>
+        // CSV URLs for all tabs
+        const CSV_URLS = {
+            NDN: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTD7tUhTO-J3E23JcJPYNOO4Tg-Fa6BPPv7AdZe0uupG-z9Zc5hE_nGLuYVDTyihGWeKKfXV888weph/pub?gid=0&single=true&output=csv',
+            YAS: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTD7tUhTO-J3E23JcJPYNOO4Tg-Fa6BPPv7AdZe0uupG-z9Zc5hE_nGLuYVDTyihGWeKKfXV888weph/pub?gid=972274690&single=true&output=csv',
+            Trackbill: null // Add when available
+        };
+        
+        let allDeals = [];
+        let yasDeals = [];
+        
+        async function loadData() {
+            document.getElementById('refreshText').textContent = 'Loading...';
+            
+            try {
+                // Fetch both CSVs in parallel
+                const [ndnResponse, yasResponse] = await Promise.all([
+                    fetch(CSV_URLS.NDN),
+                    fetch(CSV_URLS.YAS)
+                ]);
+                
+                if (!ndnResponse.ok || !yasResponse.ok) {
+                    throw new Error('Failed to fetch CSV');
+                }
+                
+                const [ndnCsv, yasCsv] = await Promise.all([
+                    ndnResponse.text(),
+                    yasResponse.text()
+                ]);
+                
+                // Parse both
+                allDeals = parseCSV(ndnCsv);
+                yasDeals = parseCSV(yasCsv);
+                
+                console.log('NDN deals:', allDeals.length);
+                console.log('YAS deals:', yasDeals.length);
+                
+                updateDashboard();
+                updateTimestamp();
+                
+                document.getElementById('refreshText').textContent = 'Data loaded! Click to refresh';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('refreshText').textContent = 'Error - Click to retry';
+            }
+        }
+        
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length < 2) return [];
+            
+            const headers = parseCSVLine(lines[0]);
+            const deals = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values[0] && values[0].trim() !== '' && values[0] !== 'Task') {
+                    const deal = {};
+                    headers.forEach((header, index) => {
+                        deal[header] = values[index] || '';
+                    });
+                    deals.push(deal);
+                }
+            }
+            
+            return deals;
+        }
+        
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+        
+        function updateDashboard() {
+            // Filter NDN data
+            const ndnDeals = allDeals.filter(d => d.Venture === 'NDN');
+            const ndnShanghaiDeals = allDeals.filter(d => d.Venture === 'NDN Shanghai');
+            
+            // Calculate totals
+            const totalDeals = allDeals.length + yasDeals.length;
+            
+            // Update tabs
+            document.getElementById('tab-all').textContent = `All (${totalDeals})`;
+            document.getElementById('tab-ndn').textContent = `NDN (${ndnDeals.length})`;
+            document.getElementById('tab-ndn-shanghai').textContent = `NDN Shanghai (${ndnShanghaiDeals.length})`;
+            document.getElementById('tab-yas').textContent = `YAS (${yasDeals.length})`;
+            document.getElementById('tab-trackbill').textContent = `Trackbill (0)`;
+            
+            // Calculate stats
+            let totalPipeline = 0;
+            let wonValue = 0;
+            
+            // Process NDN deals
+            allDeals.forEach(deal => {
+                const value = parseFloat(deal['Total Quotation Value (HKD)']?.replace(/[$,\s]/g, '')) || 0;
+                if (value > 0) totalPipeline += value;
+                
+                const status = (deal.Status || '').toLowerCase();
+                if (status.includes('won') || status.includes('completed')) {
+                    const won = parseFloat(deal['Won Deals']?.replace(/[$,\s]/g, '')) || value;
+                    if (won > 0) wonValue += won;
+                }
+            });
+            
+            // Process YAS deals (they have different column structure)
+            yasDeals.forEach(deal => {
+                // YAS sheet has different columns - adjust as needed
+                const value = parseFloat(deal['Total Quotation Value (HKD)']?.replace(/[$,\s]/g, '')) || 0;
+                if (value > 0) totalPipeline += value;
+            });
+            
+            // Update stats
+            document.getElementById('totalPipeline').textContent = '$' + (totalPipeline / 1000000).toFixed(2) + 'M';
+            document.getElementById('activeDeals').textContent = totalDeals;
+            document.getElementById('closedWon').textContent = '$' + (wonValue / 1000).toFixed(0) + 'K';
+            document.getElementById('grandTotal').textContent = totalDeals;
+            
+            // Render tables
+            renderTable('all-content', [...allDeals, ...yasDeals]);
+            renderTable('ndn-content', ndnDeals);
+            renderTable('ndn-shanghai-content', ndnShanghaiDeals);
+            renderTable('yas-content', yasDeals);
+            renderTable('trackbill-content', []);
+        }
+        
+        function renderTable(containerId, deals) {
+            const container = document.getElementById(containerId);
+            
+            if (!deals || deals.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No deals found.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table class="deals-table">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Value</th>
+                            <th>Probability</th>
+                            <th>Priority</th>
+                            <th>Next Step</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${deals.map(deal => `
+                            <tr>
+                                <td>${deal.Task || '-'}</td>
+                                <td>${getStatusBadge(deal.Status)}</td>
+                                <td>${deal['Total Quotation Value (HKD)'] || '-'}</td>
+                                <td>${deal['Closing Probability (%)'] || '-'}</td>
+                                <td>${getPriorityBadge(deal.Priority)}</td>
+                                <td>${deal['Next Step'] || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function getStatusBadge(status) {
+            if (!status) return '<span class="deal-stage stage-no-reply">Unknown</span>';
+            const s = status.toLowerCase();
+            if (s.includes('won')) return '<span class="deal-stage stage-closed-won">Won</span>';
+            if (s.includes('lost')) return '<span class="deal-stage stage-closed-lost">Lost</span>';
+            if (s.includes('progress')) return '<span class="deal-stage stage-in-progress">In Progress</span>';
+            if (s.includes('quote')) return '<span class="deal-stage stage-quote-send">Quote Sent</span>';
+            if (s.includes('meeting')) return '<span class="deal-stage stage-first-meeting">First Meeting</span>';
+            if (s.includes('paused')) return '<span class="deal-stage stage-paused">Paused</span>';
+            if (s.includes('completed')) return '<span class="deal-stage stage-completed">Completed</span>';
+            if (s.includes('no reply')) return '<span class="deal-stage stage-no-reply">No Reply</span>';
+            return '<span class="deal-stage stage-no-reply">' + status + '</span>';
+        }
+        
+        function getPriorityBadge(priority) {
+            if (!priority) return '-';
+            const p = priority.toLowerCase();
+            if (p.includes('high')) return '<span class="priority-high">High</span>';
+            if (p.includes('moderate')) return '<span class="priority-moderate">Moderate</span>';
+            if (p.includes('low')) return '<span class="priority-low">Low</span>';
+            return priority;
+        }
+        
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 'Last updated: ' + now.toLocaleString();
+        }
+        
+        function showEntity(entityId) {
+            document.querySelectorAll('.entity-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(entityId).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Auto-load on page open
+        window.onload = loadData;
+    </script>
+</body>
+</html>
