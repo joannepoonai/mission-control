@@ -3,35 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission Control | Live Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Mission Control | Action Required</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-deep-teal: #091717;
-            --color-medium-teal: #2E565D;
-            --color-accent-teal: #218090;
-            --color-bright-teal: #20B8CD;
-            --color-light-teal: #BADFDE;
-            --color-cream: #FCFAF6;
-            --color-warm-cream: #E5E3D4;
-            --color-peach: #FFD2A6;
-            --color-terracotta: #A94B30;
-            --shadow-soft: 0 4px 20px rgba(9, 23, 23, 0.08);
-            --radius-lg: 16px;
-            --radius-xl: 24px;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --border: #475569;
+            --radius: 12px;
         }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: var(--color-cream);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            color: var(--color-deep-teal);
+            line-height: 1.5;
         }
+        
         .header {
-            background: var(--color-cream);
-            padding: 24px 48px;
-            border-bottom: 1px solid var(--color-warm-cream);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
+        
         .header-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -39,169 +48,326 @@
             justify-content: space-between;
             align-items: center;
         }
-        .header-brand {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        
+        .header-brand h1 {
+            font-size: 20px;
+            font-weight: 700;
         }
-        .header-logo {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--color-accent-teal), var(--color-bright-teal));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            box-shadow: var(--shadow-soft);
-        }
-        .header-text h1 {
-            font-size: 24px;
-            font-weight: 600;
-        }
-        .header-text .subtitle {
-            font-size: 14px;
-            color: var(--color-medium-teal);
-        }
-        .refresh-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        
+        .header-brand .subtitle {
             font-size: 13px;
-            color: var(--color-medium-teal);
-            cursor: pointer;
-            padding: 8px 16px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: var(--shadow-soft);
+            color: var(--text-secondary);
+            margin-top: 2px;
         }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .refresh-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .refresh-btn:hover { background: #2563eb; }
+        
+        .last-sync {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 40px 48px;
+            padding: 24px 32px;
         }
-        .section {
-            background: white;
-            border-radius: var(--radius-xl);
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--color-warm-cream);
-        }
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
+        
+        /* Alert Banner */
+        .alert-banner {
+            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+            border-radius: var(--radius);
+            padding: 16px 24px;
             margin-bottom: 24px;
-        }
-        .entity-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 28px;
-            padding: 6px;
-            background: var(--color-cream);
-            border-radius: var(--radius-xl);
-            width: fit-content;
+            align-items: center;
+            justify-content: space-between;
         }
-        .entity-tab {
-            padding: 12px 24px;
-            border-radius: var(--radius-lg);
-            background: transparent;
-            color: var(--color-medium-teal);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 14px;
-            border: none;
-            font-family: inherit;
-        }
-        .entity-tab.active {
-            background: white;
-            color: var(--color-deep-teal);
-            box-shadow: var(--shadow-soft);
+        
+        .alert-banner h2 {
+            font-size: 16px;
             font-weight: 600;
         }
-        /* Stats Bar - Per Entity */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-        .stat-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 28px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--color-warm-cream);
-        }
-        .stat-card .label {
-            font-size: 13px;
-            color: var(--color-medium-teal);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        .stat-card .value {
-            font-size: 36px;
+        
+        .alert-banner .count {
+            font-size: 24px;
             font-weight: 700;
         }
+        
+        /* Tabs */
+        .tabs-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 6px;
+            margin-bottom: 24px;
+            display: inline-flex;
+            gap: 4px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .tab:hover { color: var(--text-primary); }
+        
+        .tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        
+        .tab .badge {
+            background: var(--accent-red);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        /* Status Breakdown */
+        .status-breakdown {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .status-chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-chip .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        /* Table */
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .table-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .filter-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        
         .deals-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
             font-size: 14px;
         }
+        
         .deals-table th {
             text-align: left;
-            padding: 16px 20px;
-            color: var(--color-medium-teal);
-            font-size: 12px;
-            text-transform: uppercase;
-            font-weight: 600;
-            border-bottom: 2px solid var(--color-warm-cream);
-            background: var(--color-cream);
-        }
-        .deals-table td {
-            padding: 18px 20px;
-            border-bottom: 1px solid var(--color-warm-cream);
-            font-weight: 500;
-        }
-        .deals-table tr:hover td {
-            background: rgba(186, 223, 222, 0.2);
-        }
-        .deal-stage {
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 12px 16px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
-            white-space: nowrap;
-            display: inline-block;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
         }
-        .stage-in-progress { background: linear-gradient(135deg, var(--color-light-teal), rgba(186, 223, 222, 0.5)); color: var(--color-medium-teal); }
-        .stage-quote-send { background: linear-gradient(135deg, var(--color-peach), rgba(255, 210, 166, 0.5)); color: var(--color-terracotta); }
-        .stage-no-reply { background: var(--color-warm-cream); color: var(--color-medium-teal); }
-        .stage-first-meeting { background: linear-gradient(135deg, #dbeafe, rgba(219, 234, 254, 0.5)); color: #2563eb; }
-        .stage-paused { background: var(--color-warm-cream); color: var(--color-medium-teal); }
-        .stage-completed { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
-        .stage-closed-won { background: linear-gradient(135deg, #dcfce7, rgba(220, 252, 231, 0.5)); color: #16a34a; }
-        .stage-closed-lost { background: linear-gradient(135deg, #fee2e2, rgba(254, 226, 226, 0.5)); color: #dc2626; }
-        .priority-high { color: var(--color-terracotta); font-weight: 600; }
-        .priority-moderate { color: #d97706; font-weight: 500; }
-        .priority-low { color: var(--color-medium-teal); font-weight: 500; }
+        
+        .deals-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .deals-table tr:last-child td { border-bottom: none; }
+        
+        .deals-table tr:hover td { background: rgba(255,255,255,0.02); }
+        
+        .deal-row.urgent { border-left: 3px solid var(--accent-red); }
+        .deal-row.warning { border-left: 3px solid var(--accent-yellow); }
+        .deal-row.normal { border-left: 3px solid var(--accent-blue); }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+        
+        .status-in-progress { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .status-in-progress .dot { background: var(--accent-blue); }
+        
+        .status-quote { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+        .status-quote .dot { background: var(--accent-purple); }
+        
+        .status-meeting { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+        .status-meeting .dot { background: var(--accent-green); }
+        
+        .status-follow-up { background: rgba(249,115,22,0.15); color: var(--accent-orange); }
+        .status-follow-up .dot { background: var(--accent-orange); }
+        
+        .status-no-reply { background: rgba(245,158,11,0.15); color: var(--accent-yellow); }
+        .status-no-reply .dot { background: var(--accent-yellow); }
+        
+        .status-paused { background: rgba(148,163,184,0.15); color: var(--text-secondary); }
+        .status-paused .dot { background: var(--text-secondary); }
+        
+        /* Priority */
+        .priority {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        
+        .priority-high { 
+            background: rgba(239,68,68,0.15); 
+            color: var(--accent-red); 
+        }
+        .priority-moderate { 
+            background: rgba(245,158,11,0.15); 
+            color: var(--accent-yellow); 
+        }
+        .priority-low { 
+            background: rgba(100,116,139,0.15); 
+            color: var(--text-secondary); 
+        }
+        
+        /* Action needed */
+        .action-needed {
+            font-size: 12px;
+            color: var(--accent-orange);
+            font-weight: 500;
+        }
+        
+        .next-step {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        /* Entity sections */
         .entity-section { display: none; }
         .entity-section.active { display: block; }
-        .loading-state, .empty-state {
-            text-align: center;
-            padding: 60px;
-            color: var(--color-medium-teal);
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        .last-updated {
-            text-align: center;
-            color: var(--color-medium-teal);
-            font-size: 13px;
-            margin-top: 40px;
+        
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .container { padding: 16px; }
+            .header { padding: 16px; }
         }
     </style>
 </head>
@@ -209,148 +375,98 @@
     <header class="header">
         <div class="header-content">
             <div class="header-brand">
-                <div class="header-logo">🎯</div>
-                <div class="header-text">
-                    <h1>Mission Control</h1>
-                    <div class="subtitle">Joanne's Agent Fleet | NDN GROUP</div>
-                </div>
+                <h1>🎯 Mission Control</h1>
+                <div class="subtitle">Action Required Dashboard | NDN GROUP</div>
             </div>
-            <div class="refresh-indicator" onclick="loadData()">
-                <span>↻</span>
-                <span id="refreshText">Click to refresh</span>
+            <div class="header-actions">
+                <span class="last-sync" id="lastSync">Loading...</span>
+                <button class="refresh-btn" onclick="loadData()">
+                    <span>↻</span> Refresh
+                </button>
             </div>
         </div>
     </header>
     
     <div class="container">
-        <div class="section">
-            <div class="section-title">💼 Deal Pipeline by Entity</div>
-            
-            <div class="entity-tabs">
-                <button class="entity-tab active" onclick="showEntity('all')" id="tab-all">All (0)</button>
-                <button class="entity-tab" onclick="showEntity('ndn')" id="tab-ndn">NDN (0)</button>
-                <button class="entity-tab" onclick="showEntity('ndn-shanghai')" id="tab-ndn-shanghai">NDN Shanghai (0)</button>
-                <button class="entity-tab" onclick="showEntity('yas')" id="tab-yas">YAS (0)</button>
-                <button class="entity-tab" onclick="showEntity('trackbill')" id="tab-trackbill">Trackbill (0)</button>
+        <!-- Alert Banner -->
+        <div class="alert-banner">
+            <div>
+                <h2>⚡ Active Opportunities Requiring Attention</h2>
+                <p style="opacity: 0.9; font-size: 14px; margin-top: 4px;">Excluding Closed Won and Closed Lost deals</p>
             </div>
-            
-            <!-- ALL ENTITIES -->
-            <div id="all" class="entity-section active">
-                <div class="stats-bar">
-                    <div class="stat-card">
-                        <div class="label">Total Pipeline</div>
-                        <div class="value" id="all-pipeline">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Active Deals</div>
-                        <div class="value" id="all-active">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Closed Won</div>
-                        <div class="value" id="all-won">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Total Deals</div>
-                        <div class="value" id="all-total">0</div>
-                    </div>
-                </div>
-                <div id="all-content"><div class="loading-state">Loading data...</div></div>
+            <div class="count" id="totalActionRequired">0</div>
+        </div>
+        
+        <!-- Entity Tabs -->
+        <div class="tabs-container">
+            <button class="tab active" onclick="showEntity('all')" id="tab-all">All<span class="badge" id="badge-all">0</span></button>
+            <button class="tab" onclick="showEntity('ndn')" id="tab-ndn">NDN<span class="badge" id="badge-ndn">0</span></button>
+            <button class="tab" onclick="showEntity('ndn-shanghai')" id="tab-ndn-shanghai">NDN Shanghai<span class="badge" id="badge-ndn-shanghai">0</span></button>
+            <button class="tab" onclick="showEntity('yas')" id="tab-yas">YAS<span class="badge" id="badge-yas">0</span></button>
+            <button class="tab" onclick="showEntity('trackbill')" id="tab-trackbill">Trackbill<span class="badge" id="badge-trackbill">0</span></button>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Pipeline</div>
+                <div class="stat-value" id="stat-pipeline">$0</div>
             </div>
-            
-            <!-- NDN -->
-            <div id="ndn" class="entity-section">
-                <div class="stats-bar">
-                    <div class="stat-card">
-                        <div class="label">NDN Pipeline</div>
-                        <div class="value" id="ndn-pipeline">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Active Deals</div>
-                        <div class="value" id="ndn-active">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Closed Won</div>
-                        <div class="value" id="ndn-won">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Total Deals</div>
-                        <div class="value" id="ndn-total">0</div>
-                    </div>
-                </div>
-                <div id="ndn-content"><div class="loading-state">Loading...</div></div>
+            <div class="stat-card">
+                <div class="stat-label">Opportunities</div>
+                <div class="stat-value" id="stat-opportunities">0</div>
             </div>
-            
-            <!-- NDN Shanghai -->
-            <div id="ndn-shanghai" class="entity-section">
-                <div class="stats-bar">
-                    <div class="stat-card">
-                        <div class="label">NDN Shanghai Pipeline</div>
-                        <div class="value" id="ndn-shanghai-pipeline">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Active Deals</div>
-                        <div class="value" id="ndn-shanghai-active">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Closed Won</div>
-                        <div class="value" id="ndn-shanghai-won">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Total Deals</div>
-                        <div class="value" id="ndn-shanghai-total">0</div>
-                    </div>
-                </div>
-                <div id="ndn-shanghai-content"><div class="loading-state">Loading...</div></div>
+            <div class="stat-card">
+                <div class="stat-label">High Priority</div>
+                <div class="stat-value" id="stat-high-priority">0</div>
             </div>
-            
-            <!-- YAS -->
-            <div id="yas" class="entity-section">
-                <div class="stats-bar">
-                    <div class="stat-card">
-                        <div class="label">YAS Pipeline</div>
-                        <div class="value" id="yas-pipeline">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Active Deals</div>
-                        <div class="value" id="yas-active">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Closed Won</div>
-                        <div class="value" id="yas-won">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Total Deals</div>
-                        <div class="value" id="yas-total">0</div>
-                    </div>
-                </div>
-                <div id="yas-content"><div class="loading-state">Loading...</div></div>
-            </div>
-            
-            <!-- Trackbill -->
-            <div id="trackbill" class="entity-section">
-                <div class="stats-bar">
-                    <div class="stat-card">
-                        <div class="label">Trackbill Pipeline</div>
-                        <div class="value" id="trackbill-pipeline">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Active Deals</div>
-                        <div class="value" id="trackbill-active">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Closed Won</div>
-                        <div class="value" id="trackbill-won">$0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="label">Total Deals</div>
-                        <div class="value" id="trackbill-total">0</div>
-                    </div>
-                </div>
-                <div id="trackbill-content"><div class="loading-state">Loading...</div></div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Deal Size</div>
+                <div class="stat-value" id="stat-avg-deal">$0</div>
             </div>
         </div>
         
-        <div class="last-updated" id="lastUpdated">Last updated: Never</div>
+        <!-- Status Breakdown -->
+        <div class="status-breakdown" id="statusBreakdown"></div>
+        
+        <!-- ALL DEALS -->
+        <div id="all" class="entity-section active">
+            <div class="table-header">
+                <h3>🎯 All Active Opportunities</h3>
+            </div>
+            <div class="table-container">
+                <div id="all-content">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <p>Loading your opportunities...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NDN -->
+        <div id="ndn" class="entity-section">
+            <div class="table-header"><h3>🔥 NDN Opportunities</h3></div>
+            <div class="table-container"><div id="ndn-content"></div></div>
+        </div>
+        
+        <!-- NDN Shanghai -->
+        <div id="ndn-shanghai" class="entity-section">
+            <div class="table-header"><h3>🏢 NDN Shanghai Opportunities</h3></div>
+            <div class="table-container"><div id="shanghai-content"></div></div>
+        </div>
+        
+        <!-- YAS -->
+        <div id="yas" class="entity-section">
+            <div class="table-header"><h3>⚡ YAS Opportunities</h3></div>
+            <div class="table-container"><div id="yas-content"></div></div>
+        </div>
+        
+        <!-- Trackbill -->
+        <div id="trackbill" class="entity-section">
+            <div class="table-header"><h3>🤖 Trackbill Opportunities</h3></div>
+            <div class="table-container"><div id="trackbill-content"></div></div>
+        </div>
     </div>
     
     <script>
@@ -360,190 +476,234 @@
             Trackbill: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTD7tUhTO-J3E23JcJPYNOO4Tg-Fa6BPPv7AdZe0uupG-z9Zc5hE_nGLuYVDTyihGWeKKfXV888weph/pub?gid=510823150&single=true&output=csv'
         };
         
-        let ndnData = [], yasData = [], trackbillData = [];
+        let allData = [];
+        
+        // Filter: Remove Closed Won and Closed Lost
+        function isActiveDeal(deal) {
+            const status = (deal.Status || '').toLowerCase();
+            return !status.includes('won') && !status.includes('lost') && !status.includes('completed');
+        }
         
         async function loadData() {
-            document.getElementById('refreshText').textContent = 'Loading...';
+            document.getElementById('lastSync').textContent = 'Syncing...';
             
             try {
-                const [ndnRes, yasRes, trackbillRes] = await Promise.all([
+                const responses = await Promise.all([
                     fetch(CSV_URLS.NDN),
                     fetch(CSV_URLS.YAS),
                     fetch(CSV_URLS.Trackbill)
                 ]);
                 
-                const [ndnCsv, yasCsv, trackbillCsv] = await Promise.all([
-                    ndnRes.text(),
-                    yasRes.text(),
-                    trackbillRes.text()
-                ]);
+                const [ndnCsv, yasCsv, trackbillCsv] = await Promise.all(
+                    responses.map(r => r.text())
+                );
                 
-                ndnData = parseCSV(ndnCsv);
-                yasData = parseCSV(yasCsv);
-                trackbillData = parseCSV(trackbillCsv);
+                const ndnData = parseCSV(ndnCsv).map(d => ({...d, entity: 'NDN'}));
+                const yasData = parseCSV(yasCsv).map(d => ({...d, entity: 'YAS'}));
+                const trackbillData = parseCSV(trackbillCsv).map(d => ({...d, entity: 'Trackbill'}));
+                
+                // Combine and filter out closed deals
+                allData = [...ndnData, ...yasData, ...trackbillData].filter(isActiveDeal);
                 
                 updateDashboard();
-                updateTimestamp();
-                document.getElementById('refreshText').textContent = 'Click to refresh';
+                document.getElementById('lastSync').textContent = 'Updated ' + new Date().toLocaleTimeString();
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('refreshText').textContent = 'Error - Retry';
+                document.getElementById('lastSync').textContent = 'Sync failed';
             }
         }
         
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            if (lines.length < 2) return [];
-            const headers = parseCSVLine(lines[0]);
-            const deals = [];
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseCSVLine(lines[i]);
-                if (values[0] && values[0].trim() !== '' && values[0] !== 'Task') {
-                    const deal = {};
-                    headers.forEach((h, j) => deal[h] = values[j] || '');
-                    deals.push(deal);
-                }
-            }
-            return deals;
-        }
-        
-        function parseCSVLine(line) {
-            const result = [];
-            let current = '';
-            let inQuotes = false;
-            for (const char of line) {
-                if (char === '"') inQuotes = !inQuotes;
-                else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
-                else current += char;
-            }
-            result.push(current.trim());
-            return result;
-        }
-        
-        function calcStats(deals) {
-            let pipeline = 0, won = 0, wonCount = 0;
-            deals.forEach(d => {
-                const val = parseFloat(d['Total Quotation Value (HKD)']?.replace(/[$,\s]/g, '')) || 0;
-                if (val > 0) pipeline += val;
-                const status = (d.Status || '').toLowerCase();
-                if (status.includes('won') || status.includes('completed')) {
-                    const w = parseFloat(d['Won Deals']?.replace(/[$,\s]/g, '')) || val;
-                    if (w > 0) { won += w; wonCount++; }
-                }
-            });
-            return { pipeline, won, total: deals.length };
+        function parseCSV(csv) {
+            const lines = csv.trim().split('\n');
+            const headers = lines[0].split(',');
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                const obj = {};
+                headers.forEach((h, i) => obj[h.trim()] = values[i]?.trim() || '');
+                return obj;
+            }).filter(row => row.Task && row.Task !== 'Task');
         }
         
         function updateDashboard() {
-            // Filter NDN data
-            const ndnOnly = ndnData.filter(d => d.Venture === 'NDN');
-            const ndnShanghai = ndnData.filter(d => d.Venture === 'NDN Shanghai');
+            // Filter by entity
+            const ndnDeals = allData.filter(d => d.Venture === 'NDN');
+            const shanghaiDeals = allData.filter(d => d.Venture === 'NDN Shanghai');
+            const yasDeals = allData.filter(d => d.entity === 'YAS');
+            const trackbillDeals = allData.filter(d => d.entity === 'Trackbill');
             
-            // Calculate stats for each entity
-            const allStats = calcStats([...ndnData, ...yasData, ...trackbillData]);
-            const ndnStats = calcStats(ndnOnly);
-            const ndnShanghaiStats = calcStats(ndnShanghai);
-            const yasStats = calcStats(yasData);
-            const trackbillStats = calcStats(trackbillData);
+            // Update badge counts
+            document.getElementById('badge-all').textContent = allData.length;
+            document.getElementById('badge-ndn').textContent = ndnDeals.length;
+            document.getElementById('badge-ndn-shanghai').textContent = shanghaiDeals.length;
+            document.getElementById('badge-yas').textContent = yasDeals.length;
+            document.getElementById('badge-trackbill').textContent = trackbillDeals.length;
             
-            // Update tabs
-            document.getElementById('tab-all').textContent = `All (${allStats.total})`;
-            document.getElementById('tab-ndn').textContent = `NDN (${ndnStats.total})`;
-            document.getElementById('tab-ndn-shanghai').textContent = `NDN Shanghai (${ndnShanghaiStats.total})`;
-            document.getElementById('tab-yas').textContent = `YAS (${yasStats.total})`;
-            document.getElementById('tab-trackbill').textContent = `Trackbill (${trackbillStats.total})`;
+            // Update total in banner
+            document.getElementById('totalActionRequired').textContent = allData.length;
             
-            // Update stats for ALL
-            document.getElementById('all-pipeline').textContent = '$' + (allStats.pipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('all-active').textContent = allStats.total;
-            document.getElementById('all-won').textContent = '$' + (allStats.won / 1000).toFixed(0) + 'K';
-            document.getElementById('all-total').textContent = allStats.total;
-            
-            // Update stats for NDN
-            document.getElementById('ndn-pipeline').textContent = '$' + (ndnStats.pipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('ndn-active').textContent = ndnStats.total;
-            document.getElementById('ndn-won').textContent = '$' + (ndnStats.won / 1000).toFixed(0) + 'K';
-            document.getElementById('ndn-total').textContent = ndnStats.total;
-            
-            // Update stats for NDN Shanghai
-            document.getElementById('ndn-shanghai-pipeline').textContent = '$' + (ndnShanghaiStats.pipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('ndn-shanghai-active').textContent = ndnShanghaiStats.total;
-            document.getElementById('ndn-shanghai-won').textContent = '$' + (ndnShanghaiStats.won / 1000).toFixed(0) + 'K';
-            document.getElementById('ndn-shanghai-total').textContent = ndnShanghaiStats.total;
-            
-            // Update stats for YAS
-            document.getElementById('yas-pipeline').textContent = '$' + (yasStats.pipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('yas-active').textContent = yasStats.total;
-            document.getElementById('yas-won').textContent = '$' + (yasStats.won / 1000).toFixed(0) + 'K';
-            document.getElementById('yas-total').textContent = yasStats.total;
-            
-            // Update stats for Trackbill
-            document.getElementById('trackbill-pipeline').textContent = '$' + (trackbillStats.pipeline / 1000000).toFixed(2) + 'M';
-            document.getElementById('trackbill-active').textContent = trackbillStats.total;
-            document.getElementById('trackbill-won').textContent = '$' + (trackbillStats.won / 1000).toFixed(0) + 'K';
-            document.getElementById('trackbill-total').textContent = trackbillStats.total;
+            // Calculate stats for current entity (All by default)
+            updateStats(allData);
+            updateStatusBreakdown(allData);
             
             // Render tables
-            renderTable('all-content', [...ndnData, ...yasData, ...trackbillData]);
-            renderTable('ndn-content', ndnOnly);
-            renderTable('ndn-shanghai-content', ndnShanghai);
-            renderTable('yas-content', yasData);
-            renderTable('trackbill-content', trackbillData);
+            renderTable('all-content', allData);
+            renderTable('ndn-content', ndnDeals);
+            renderTable('shanghai-content', shanghaiDeals);
+            renderTable('yas-content', yasDeals);
+            renderTable('trackbill-content', trackbillDeals);
+        }
+        
+        function updateStats(deals) {
+            let pipeline = 0, highPriority = 0;
+            
+            deals.forEach(d => {
+                const val = parseFloat(d['Total Quotation Value (HKD)']?.replace(/[$,\s]/g, '')) || 0;
+                pipeline += val;
+                
+                const priority = (d.Priority || '').toLowerCase();
+                if (priority.includes('high')) highPriority++;
+            });
+            
+            const avgDeal = deals.length > 0 ? pipeline / deals.length : 0;
+            
+            document.getElementById('stat-pipeline').textContent = '$' + (pipeline / 1000000).toFixed(2) + 'M';
+            document.getElementById('stat-opportunities').textContent = deals.length;
+            document.getElementById('stat-high-priority').textContent = highPriority;
+            document.getElementById('stat-avg-deal').textContent = '$' + (avgDeal / 1000).toFixed(0) + 'K';
+        }
+        
+        function updateStatusBreakdown(deals) {
+            const counts = {};
+            deals.forEach(d => {
+                const status = d.Status || 'Unknown';
+                counts[status] = (counts[status] || 0) + 1;
+            });
+            
+            const statusColors = {
+                'In Progress': '#3b82f6',
+                'Quote Send': '#8b5cf6',
+                'No Reply': '#f59e0b',
+                'First Meeting': '#10b981',
+                'Paused': '#64748b'
+            };
+            
+            const container = document.getElementById('statusBreakdown');
+            container.innerHTML = Object.entries(counts)
+                .map(([status, count]) => `
+                    <div class="status-chip">
+                        <span class="dot" style="background: ${statusColors[status] || '#64748b'}"></span>
+                        ${status}: ${count}
+                    </div>
+                `).join('');
         }
         
         function renderTable(containerId, deals) {
             const container = document.getElementById(containerId);
-            if (!deals || deals.length === 0) {
-                container.innerHTML = '<div class="empty-state"><p>No deals found.</p></div>';
+            
+            if (!deals.length) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <h3>No active deals</h3>
+                        <p>All caught up! No opportunities requiring attention.</p>
+                    </div>`;
                 return;
             }
+            
+            // Sort: High priority first, then by status urgency
+            const sorted = [...deals].sort((a, b) => {
+                const priorityOrder = { 'High': 0, 'Moderate': 1, 'Low': 2 };
+                const pa = priorityOrder[a.Priority] || 2;
+                const pb = priorityOrder[b.Priority] || 2;
+                return pa - pb;
+            });
+            
             container.innerHTML = `
                 <table class="deals-table">
-                    <thead><tr><th>Company</th><th>Status</th><th>Value</th><th>Probability</th><th>Priority</th><th>Next Step</th></tr></thead>
-                    <tbody>${deals.map(d => `
+                    <thead>
                         <tr>
-                            <td>${d.Task || '-'}</td>
-                            <td>${getStatus(d.Status)}</td>
-                            <td>${d['Total Quotation Value (HKD)'] || '-'}</td>
-                            <td>${d['Closing Probability (%)'] || '-'}</td>
-                            <td>${getPriority(d.Priority)}</td>
-                            <td>${d['Next Step'] || '-'}</td>
-                        </tr>`).join('')}</tbody>
-                </table>`;
+                            <th>Company</th>
+                            <th>Status</th>
+                            <th>Value</th>
+                            <th>Priority</th>
+                            <th>Next Step</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.map(d => {
+                            const urgencyClass = getUrgencyClass(d);
+                            return `
+                            <tr class="deal-row ${urgencyClass}">
+                                <td><strong>${d.Task}</strong><br><span style="font-size: 12px; color: var(--text-secondary)">${d.entity}</span></td>
+                                <td>${getStatusBadge(d.Status)}</td>
+                                <td>${d['Total Quotation Value (HKD)'] || '-'}</td>
+                                <td>${getPriorityBadge(d.Priority)}</td>
+                                <td class="next-step" title="${d['Next Step'] || ''}">${d['Next Step'] || '-'}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
         }
         
-        function getStatus(s) {
-            if (!s) return '<span class="deal-stage stage-no-reply">Unknown</span>';
-            const status = s.toLowerCase();
-            if (status.includes('won')) return '<span class="deal-stage stage-closed-won">Won</span>';
-            if (status.includes('lost')) return '<span class="deal-stage stage-closed-lost">Lost</span>';
-            if (status.includes('progress')) return '<span class="deal-stage stage-in-progress">In Progress</span>';
-            if (status.includes('quote')) return '<span class="deal-stage stage-quote-send">Quote Sent</span>';
-            if (status.includes('meeting')) return '<span class="deal-stage stage-first-meeting">First Meeting</span>';
-            if (status.includes('paused')) return '<span class="deal-stage stage-paused">Paused</span>';
-            if (status.includes('completed')) return '<span class="deal-stage stage-completed">Completed</span>';
-            if (status.includes('no reply')) return '<span class="deal-stage stage-no-reply">No Reply</span>';
-            return '<span class="deal-stage stage-no-reply">' + s + '</span>';
+        function getUrgencyClass(deal) {
+            const priority = (deal.Priority || '').toLowerCase();
+            const status = (deal.Status || '').toLowerCase();
+            
+            if (priority.includes('high')) return 'urgent';
+            if (status.includes('no reply') || status.includes('follow')) return 'warning';
+            return 'normal';
         }
         
-        function getPriority(p) {
-            if (!p) return '-';
-            const pr = p.toLowerCase();
-            if (pr.includes('high')) return '<span class="priority-high">High</span>';
-            if (pr.includes('moderate')) return '<span class="priority-moderate">Moderate</span>';
-            if (pr.includes('low')) return '<span class="priority-low">Low</span>';
-            return p;
+        function getStatusBadge(status) {
+            if (!status) return '<span class="status-badge"><span class="dot" style="background:#64748b"></span>Unknown</span>';
+            
+            const s = status.toLowerCase();
+            
+            if (s.includes('progress')) 
+                return '<span class="status-badge status-in-progress"><span class="dot"></span>In Progress</span>';
+            
+            if (s.includes('quote')) 
+                return '<span class="status-badge status-quote"><span class="dot"></span>Quote Sent</span>';
+            
+            if (s.includes('meeting')) 
+                return '<span class="status-badge status-meeting"><span class="dot"></span>First Meeting</span>';
+            
+            if (s.includes('reply') || s.includes('follow')) 
+                return '<span class="status-badge status-follow-up"><span class="dot"></span>Follow Up</span>';
+            
+            if (s.includes('paused')) 
+                return '<span class="status-badge status-paused"><span class="dot"></span>Paused</span>';
+            
+            return `<span class="status-badge"><span class="dot" style="background:#64748b"></span>${status}</span>`;
         }
         
-        function updateTimestamp() {
-            document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleString();
+        function getPriorityBadge(priority) {
+            if (!priority) return '-';
+            
+            const p = priority.toLowerCase();
+            if (p.includes('high')) 
+                return '<span class="priority priority-high">🔥 High</span>';
+            if (p.includes('moderate')) 
+                return '<span class="priority priority-moderate">Medium</span>';
+            
+            return '<span class="priority priority-low">Low</span>';
         }
         
         function showEntity(id) {
             document.querySelectorAll('.entity-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.entity-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             event.target.classList.add('active');
+            
+            // Update stats for selected entity
+            let data = allData;
+            if (id === 'ndn') data = allData.filter(d => d.Venture === 'NDN');
+            else if (id === 'ndn-shanghai') data = allData.filter(d => d.Venture === 'NDN Shanghai');
+            else if (id === 'yas') data = allData.filter(d => d.entity === 'YAS');
+            else if (id === 'trackbill') data = allData.filter(d => d.entity === 'Trackbill');
+            
+            updateStats(data);
+            updateStatusBreakdown(data);
         }
         
         window.onload = loadData;
